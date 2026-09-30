@@ -1,0 +1,167 @@
+{
+  "N": 30,
+  "table2": {
+    "llama3.1:8b": {
+      "email": {
+        "exposed": 122,
+        "asr": 1,
+        "detected": 18,
+        "n": 150
+      },
+      "rag": {
+        "retrieved": 30,
+        "asr": 30,
+        "detected": 0,
+        "n": 30
+      },
+      "web": {
+        "exposed": 24,
+        "asr": 3,
+        "detected": 0,
+        "n": 30
+      }
+    },
+    "qwen2.5:7b": {
+      "email": {
+        "exposed": 62,
+        "asr": 2,
+        "detected": 47,
+        "n": 150
+      },
+      "rag": {
+        "retrieved": 30,
+        "asr": 30,
+        "detected": 23,
+        "n": 30
+      },
+      "web": {
+        "exposed": 27,
+        "asr": 27,
+        "detected": 0,
+        "n": 30
+      }
+    },
+    "mistral:7b": {
+      "rag": {
+        "retrieved": 25,
+        "asr": 21,
+        "detected": 8,
+        "n": 30
+      },
+      "web": {
+        "exposed": 29,
+        "asr": 19,
+        "detected": 3,
+        "n": 30
+      }
+    }
+  },
+  "table3_rag": {
+    "llama3.1:8b": {
+      "baseline": {
+        "retrieved": 30,
+        "asr": 30,
+        "detected": 0,
+        "n": 30
+      },
+      "hardened": {
+        "retrieved": 30,
+        "asr": 30,
+        "detected": 0,
+        "n": 30
+      },
+      "sanitize": {
+        "retrieved": 30,
+        "asr": 30,
+        "detected": 2,
+        "n": 30
+      },
+      "both": {
+        "retrieved": 30,
+        "asr": 30,
+        "detected": 0,
+        "n": 30
+      }
+    },
+    "qwen2.5:7b": {
+      "baseline": {
+        "retrieved": 30,
+        "asr": 30,
+        "detected": 25,
+        "n": 30
+      },
+      "hardened": {
+        "retrieved": 29,
+        "asr": 29,
+        "detected": 6,
+        "n": 30
+      },
+      "sanitize": {
+        "retrieved": 30,
+        "asr": 30,
+        "detected": 16,
+        "n": 30
+      },
+      "both": {
+        "retrieved": 29,
+        "asr": 29,
+        "detected": 19,
+        "n": 30
+      }
+    }
+  },
+  "table3_web": {
+    "llama3.1:8b": {
+      "baseline": {
+        "exposed": 23,
+        "asr": 2,
+        "detected": 0,
+        "n": 30
+      },
+      "hardened": {
+        "exposed": 24,
+        "asr": 1,
+        "detected": 1,
+        "n": 30
+      },
+      "sanitize": {
+        "exposed": 20,
+        "asr": 0,
+        "detected": 0,
+        "n": 30
+      },
+      "both": {
+        "exposed": 28,
+        "asr": 0,
+        "detected": 0,
+        "n": 30
+      }
+    },
+    "qwen2.5:7b": {
+      "baseline": {
+        "exposed": 26,
+        "asr": 26,
+        "detected": 0,
+        "n": 30
+      },
+      "hardened": {
+        "exposed": 30,
+        "asr": 30,
+        "detected": 0,
+        "n": 30
+      },
+      "sanitize": {
+        "exposed": 18,
+        "asr": 0,
+        "detected": 0,
+        "n": 30
+      },
+      "both": {
+        "exposed": 30,
+        "asr": 0,
+        "detected": 0,
+        "n": 30
+      }
+    }
+  }
+}
