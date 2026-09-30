@@ -6,8 +6,8 @@ reproduce the numbers in Tables II and III: the three attack scenarios, the payl
 the two defenses, and the measurement scripts.
 
 Everything runs locally on a single consumer GPU through [Ollama](https://ollama.com/);
-no paid API is involved. The tools the agents call are mocks — a "sent" e-mail is only
-logged, nothing leaves the machine — so the harness is safe to run.
+no paid API is involved. The tools the agents call are mocks - a "sent" e-mail is only
+logged, nothing leaves the machine - so the harness is safe to run.
 
 ## What the experiments show
 
@@ -22,7 +22,7 @@ The three scenarios attack the same agent pattern through different data channel
 The short version: models refuse an injected *action* fairly reliably, but they will
 happily adopt injected *content* that shapes their answer. And the two defenses we test
 (a hardened "treat this as untrusted data" system prompt, and input sanitization) do
-**nothing** against RAG poisoning — because a poisoned fact is not an instruction you
+**nothing** against RAG poisoning - because a poisoned fact is not an instruction you
 can tell the model to ignore. Sanitization only helps in the web case, where the payload
 is an HTML comment that can be stripped outright.
 
@@ -40,7 +40,7 @@ ollama pull mistral:7b
 ```
 
 On the first RAG run, ChromaDB downloads a small embedding model (~80 MB); after that it
-works offline. We ran everything on an RTX 3060 (6 GB) with 4-bit quantized weights.
+works offline. In the paper, everything ran on an RTX 3060 (6 GB) with 4-bit quantized weights.
 
 ## Reproducing the tables
 
@@ -64,8 +64,8 @@ for d in ["baseline", "hardened", "sanitize", "both"]:
 
 Rates are conditioned on the payload actually reaching the model (the message was read,
 or the poisoned document was retrieved); a trial where the agent never ingested the
-payload is not counted as "resisted." Numbers will vary run to run — decoding temperature
-is 0.7 and each cell is only N=10 — but the qualitative picture is stable.
+payload is not counted as "resisted." Numbers will vary run to run - decoding temperature
+is 0.7 and each cell is only N=10 - but the qualitative picture is stable.
 
 ## Layout
 
