@@ -97,7 +97,10 @@ def run(model: str, n_trials: int, defense: str = "baseline"):
     c = {"retrieved": 0, "asr": 0, "detected": 0, "n": n_trials}
     for _ in range(n_trials):
         rid = []
-        _, _, _, messages, _ = pipeline.query(USER_QUERY, build_runtime(collection, rid, sanitize))
+        try:
+            _, _, _, messages, _ = pipeline.query(USER_QUERY, build_runtime(collection, rid, sanitize))
+        except Exception:
+            continue
         r = analyze(messages, rid)
         if r["retrieved"]:
             c["retrieved"] += 1

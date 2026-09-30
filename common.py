@@ -25,7 +25,9 @@ TEMPERATURE = 0.7            # fixed across every run; 0.7 so repeated trials ac
 def build_pipeline(model: str, system_prompt: str, tool_formatter) -> AgentPipeline:
     """A standard tool-using agent: system prompt, the user query, the model, and a
     loop that runs any tool calls and feeds the results back until the model stops."""
-    client = openai.OpenAI(base_url=OLLAMA_URL, api_key="ollama")
+    # A per-request timeout so a runaway generation (issue #202: no token cap) fails the
+    # single trial instead of stalling the whole run.
+    client = openai.OpenAI(base_url=OLLAMA_URL, api_key="ollama", timeout=180)
     llm = LocalLLM(client=client, model=model, temperature=TEMPERATURE)
     return AgentPipeline([
         SystemMessage(system_prompt),
@@ -75,3 +77,53 @@ def wilson(k: int, n: int, z: float = 1.96):
     centre = (p + z * z / (2 * n)) / denom
     half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / denom
     return (100 * p, 100 * max(0.0, centre - half), 100 * min(1.0, centre + half))
+
+
+def _patch_local_llm_parser() -> None:
+    """Make AgentDojo's local-model tool-call parser tolerant of two common quirks
+    (AgentDojo issue #202): a no-argument call written as `<function=name></function>`
+    with no `{}`, and a body wrapped in a ```json ... ``` fence. The stock parser drops
+    both, which silently kills no-argument tools such as list_emails. We install the fix
+    here so it ships with the harness and the runs stay reproducible.
+    """
+    import json
+    import re as _re
+    from agentdojo.agent_pipeline.llms import local_llm as ll
+
+    def parse(completion: str):
+        blank = ll.ChatAssistantMessage(
+            role="assistant",
+            content=[ll.text_content_block_from_string(completion.strip())],
+            tool_calls=[],
+        )
+        m = _re.search(r"<function\s*=\s*([^>]+)>", completion)
+        if not m:
+            return blank
+        name = m.group(1).strip()
+        start = m.end()
+        end = completion.find("</function>", start)
+        raw = completion[start: end if end != -1 else len(completion)].strip()
+        raw = _re.sub(r"^```(?:json)?\s*", "", raw)
+        raw = _re.sub(r"\s*```$", "", raw).strip()
+        if raw == "":
+            raw = "{}"                       # no-arg call the model forgot to write as {}
+        try:
+            args = json.loads(raw)
+        except Exception:
+            grab = _re.search(r"\{.*\}", raw, _re.DOTALL)   # first balanced object, ignore trailing junk
+            try:
+                args = json.loads(grab.group(0)) if grab else None
+            except Exception:
+                args = None
+        if not isinstance(args, dict):
+            return blank
+        return ll.ChatAssistantMessage(
+            role="assistant",
+            content=[ll.text_content_block_from_string(completion.strip())],
+            tool_calls=[ll.FunctionCall(function=name, args=args)],
+        )
+
+    ll._parse_model_output = parse
+
+
+_patch_local_llm_parser()

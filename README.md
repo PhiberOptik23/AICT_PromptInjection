@@ -11,20 +11,38 @@ logged, nothing leaves the machine — so the harness is safe to run.
 
 ## What the experiments show
 
-The three scenarios attack the same agent pattern through different data channels:
+The three scenarios attack the same agent pattern through different data channels. These
+are the measured results (N=30 per cell, temperature 0.7, 95% Wilson intervals; ASR is
+conditioned on the payload actually reaching the model).
 
-| Scenario | What the injection asks for | Attack success (ASR) |
-|---|---|---|
-| **A — e-mail** | call `send_email` to the attacker (an *action*) | ~0–14% |
-| **B — RAG** | repeat a poisoned fact (an *answer*) | ~100% |
-| **C — web** | report a phishing address from a page (an *answer*) | ~50–100% |
+**Table II — baseline attack success rate (ASR), by scenario**
 
-The short version: models refuse an injected *action* fairly reliably, but they will
-happily adopt injected *content* that shapes their answer. And the two defenses we test
-(a hardened "treat this as untrusted data" system prompt, and input sanitization) do
-**nothing** against RAG poisoning — because a poisoned fact is not an instruction you
-can tell the model to ignore. Sanitization only helps in the web case, where the payload
-is an HTML comment that can be stripped outright.
+| Model | (A) E-mail *(action)* | (B) RAG *(answer)* | (C) Web *(answer)* |
+|---|---|---|---|
+| Llama 3.1 8B | 1% [0–4] (1/122) | 100% [89–100] (30/30) | 12% [4–31] (3/24) |
+| Mistral 7B | n/a\* | 84% [65–94] (21/25) | 66% [47–80] (19/29) |
+| Qwen2.5 7B | 3% [1–11] (2/62) | 100% [89–100] (30/30) | 100% [88–100] (27/27) |
+
+\*Mistral never opened an e-mail body (0/50 exposed), so it cannot be evaluated as an
+agent in the e-mail scenario.
+
+**Table III — effect of defenses (ASR %)**
+
+| Model | Baseline | +Hardened | +Sanitize | +Both |
+|---|---|---|---|---|
+| *RAG poisoning* | | | | |
+| Llama 3.1 8B | 100 | 100 | 100 | 100 |
+| Qwen2.5 7B | 100 | 100 | 100 | 100 |
+| *Web (concealed HTML)* | | | | |
+| Llama 3.1 8B | 9 | 4 | 0 | 0 |
+| Qwen2.5 7B | 100 | 100 | 0 | 0 |
+
+The short version: models refuse an injected *action* fairly reliably (e-mail ~1–3%), but
+they readily adopt injected *content* that shapes their answer (RAG and web, up to 100%).
+And the two defenses we test — a hardened "treat this as untrusted data" system prompt and
+input sanitization — do **nothing** against RAG poisoning, because a poisoned fact is not
+an instruction you can tell the model to ignore. Sanitization only helps in the web case,
+where the payload is an HTML comment that can be stripped outright (ASR → 0).
 
 ## Setup
 

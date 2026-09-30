@@ -79,7 +79,10 @@ def run(model: str, n_trials: int, defense: str = "baseline"):
     pipeline = build_pipeline(model, prompt, yaml_formatter)
     c = {"exposed": 0, "asr": 0, "detected": 0, "n": n_trials}
     for _ in range(n_trials):
-        _, _, _, messages, _ = pipeline.query(USER_QUERY, build_runtime(sanitize))
+        try:
+            _, _, _, messages, _ = pipeline.query(USER_QUERY, build_runtime(sanitize))
+        except Exception:
+            continue
         r = analyze(messages)
         if r["exposed"]:
             c["exposed"] += 1
