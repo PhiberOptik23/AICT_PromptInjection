@@ -1,0 +1,4 @@
+agentdojo==0.1.35
+openai>=1.59
+chromadb>=1.5
+pyyaml>=6.0
